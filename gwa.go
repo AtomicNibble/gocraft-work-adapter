@@ -15,6 +15,7 @@ import (
 // Options describes the adapter configuration.
 type Options struct {
 	*redis.Pool
+	WorkerPool     *work.WorkerPool
 	Logger         Logger
 	Name           string
 	MaxConcurrency int
@@ -29,8 +30,11 @@ func New(opts Options) *Adapter {
 	opts.Name = defaults.String(opts.Name, "buffalo")
 	enqueuer := work.NewEnqueuer(opts.Name, opts.Pool)
 
-	opts.MaxConcurrency = defaults.Int(opts.MaxConcurrency, 25)
-	pool := work.NewWorkerPool(struct{}{}, uint(opts.MaxConcurrency), opts.Name, opts.Pool)
+	pool := opts.WorkerPool
+	if pool == nil {
+		opts.MaxConcurrency = defaults.Int(opts.MaxConcurrency, 25)
+		pool = work.NewWorkerPool(struct{}{}, uint(opts.MaxConcurrency), opts.Name, opts.Pool)
+	}
 
 	if opts.Logger == nil {
 		l := logrus.New()
