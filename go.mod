@@ -1,5 +1,4 @@
-module github.com/gobuffalo/gocraft-work-adapter/v2
-
+module github.com/gobuffalo/gocraft-work-adapter
 go 1.13
 
 require (
